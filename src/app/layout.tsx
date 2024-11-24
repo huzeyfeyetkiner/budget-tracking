@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import AppHeader from "@/components/layout/app-header"
+import Provider from "./providers"
 
 const geistSans = localFont({
 	src: "./fonts/GeistVF.woff",
@@ -38,13 +39,17 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<SidebarProvider>
-						<AppSidebar />
-						<main className="flex flex-1 flex-col">
-							<AppHeader />
-							<div className="flex flex-1 p-4">{children}</div>
-						</main>
-					</SidebarProvider>
+					<Provider>
+						<SidebarProvider>
+							<AppSidebar />
+							<main className="flex flex-1 flex-col">
+								<AppHeader />
+								<div className="flex flex-1 p-4">
+									{children}
+								</div>
+							</main>
+						</SidebarProvider>
+					</Provider>
 				</ThemeProvider>
 			</body>
 		</html>
