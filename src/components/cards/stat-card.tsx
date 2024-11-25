@@ -1,19 +1,24 @@
-import { HandCoins } from "lucide-react"
 import React from "react"
 
-function StatCard() {
+type StatCardProps = {
+	title: string
+	value: number
+	icon: React.ReactNode
+}
+
+function StatCard({ title, value, icon }: StatCardProps) {
 	return (
 		<div className="w-full bg-sidebar border border-sidebar-border p-3 rounded-xl">
 			<div className="flex flex-col">
 				<div className="flex flex-row items-center justify-between">
 					<div className="flex flex-col">
 						<span className="text-xs text-sidebar-text-light">
-							Total Revenue
+							{title}
 						</span>
-						<span className="text-xl">₺ 1,00,000</span>
+						<span className="text-xl">{value}₺</span>
 					</div>
 
-					<HandCoins />
+					{icon}
 				</div>
 
 				{/* <div className="flex justify-between mt-4">

@@ -8,33 +8,18 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { ChartColumn, Home } from "lucide-react"
 
 const items = [
 	{
 		title: "Home",
-		url: "#",
+		url: "/",
 		icon: Home,
 	},
 	{
-		title: "Inbox",
-		url: "#",
-		icon: Inbox,
-	},
-	{
-		title: "Calendar",
-		url: "#",
-		icon: Calendar,
-	},
-	{
-		title: "Search",
-		url: "#",
-		icon: Search,
-	},
-	{
-		title: "Settings",
-		url: "#",
-		icon: Settings,
+		title: "Grafikler",
+		url: "/grafikler",
+		icon: ChartColumn,
 	},
 ]
 

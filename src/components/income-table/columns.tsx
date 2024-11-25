@@ -1,9 +1,9 @@
 "use client"
 
-import { Expense } from "@/types/expense"
+import { Income } from "@/types/expense-income"
 import { ColumnDef } from "@tanstack/react-table"
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<Income>[] = [
 	{
 		accessorKey: "title",
 		header: "Başlık",

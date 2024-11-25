@@ -10,9 +10,20 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
+	FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { format, parse } from "date-fns"
+
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select"
+
+import { categories } from "@/constants/categories"
 
 import {
 	Dialog,
@@ -23,36 +34,28 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog"
-import { useExpense } from "@/context/expense-context"
 import { useState } from "react"
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../ui/select"
-import { categories } from "@/constants/categories"
+import { useIncome } from "@/context/income-context"
 
-const expenseFormSchema = z.object({
+const incomeFormSchema = z.object({
 	title: z
 		.string()
 		.min(3, {
-			message: "Masraf başlığı en az 3 karakter olmalıdır.",
+			message: "Gelir başlığı en az 3 karakter olmalıdır.",
 		})
 		.max(255, {
-			message: "Masraf başlığı en fazla 255 karakter olmalıdır.",
+			message: "Gelir başlığı en fazla 255 karakter olmalıdır.",
 		}),
 	description: z
 		.string()
 		.min(3, {
-			message: "Masraf açıklaması en az 3 karakter olmalıdır.",
+			message: "Gelir açıklaması en az 3 karakter olmalıdır.",
 		})
 		.max(255, {
-			message: "Masraf açıklaması en fazla 255 karakter olmalıdır.",
+			message: "Gelir açıklaması en fazla 255 karakter olmalıdır.",
 		}),
-	amount: z.string().regex(/^\d+(\.\d{1,2})?$/, {
-		message: "Masraf miktarı geçerli bir sayı olmalıdır.",
+	amount: z.coerce.number().positive({
+		message: "Gelir miktarı pozitif bir sayı olmalıdır.",
 	}),
 	date: z
 		.string()
@@ -61,38 +64,40 @@ const expenseFormSchema = z.object({
 			"Geçerli bir tarih giriniz. (GG/AA/YYYY)"
 		),
 	category: z.string().min(1, {
-		message: "Masraf kategorisi seçilmelidir.",
+		message: "Gelir kategorisi seçilmelidir.",
 	}),
 })
 
-export function ExpenseForm() {
-	const { addExpense } = useExpense()
+export function IncomeForm() {
+	const { addIncome, incomes } = useIncome()
 	const [open, setOpen] = useState(false)
 
-	const expenseForm = useForm<z.infer<typeof expenseFormSchema>>({
-		resolver: zodResolver(expenseFormSchema),
+	const incomeForm = useForm<z.infer<typeof incomeFormSchema>>({
+		resolver: zodResolver(incomeFormSchema),
 		defaultValues: {
 			title: "",
 			description: "",
-			amount: "",
+			amount: 0,
 			date: "",
 			category: "",
 		},
 	})
 
-	function onSubmit(values: z.infer<typeof expenseFormSchema>) {
+	function onSubmit(values: z.infer<typeof incomeFormSchema>) {
 		const date = parse(values.date, "dd/MM/yyyy", new Date())
 		const formattedDate = format(date, "dd/MM/yyyy")
 
-		const expense = {
+		const income = {
 			...values,
 			id: Math.random().toString(36).substr(2, 9),
 			date: formattedDate,
-			amount: parseFloat(values.amount),
 		}
 
-		addExpense(expense)
-		expenseForm.reset()
+		console.log(income)
+		console.log("incomes", incomes)
+
+		addIncome(income)
+		incomeForm.reset()
 		setOpen(false)
 	}
 
@@ -119,82 +124,85 @@ export function ExpenseForm() {
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogTrigger asChild>
 					<Button className="w-full" type="button" variant="default">
-						Masraf Gir
+						Gelir Gir
 					</Button>
 				</DialogTrigger>
 				<DialogContent className="sm:max-w-[425px]">
 					<DialogHeader>
-						<DialogTitle>Masraf Girme Formu</DialogTitle>
+						<DialogTitle>Gelir Girme Formu</DialogTitle>
 						<DialogDescription>
-							Aşağıdaki formu doldurarak masraf girişi
+							Aşağıdaki formu doldurarak gelir girişi
 							yapabilirsiniz.
 						</DialogDescription>
 					</DialogHeader>
-					<Form {...expenseForm}>
+					<Form {...incomeForm}>
 						<form
-							onSubmit={expenseForm.handleSubmit(onSubmit)}
+							onSubmit={incomeForm.handleSubmit(onSubmit)}
 							className="space-y-1"
 						>
 							<FormField
-								control={expenseForm.control}
+								control={incomeForm.control}
 								name="title"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Masraf Başlığı</FormLabel>
+										<FormLabel>Gelir Başlığı</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="Masraf için başlık giriniz"
+												placeholder="Gelir için başlık giriniz"
 												{...field}
 											/>
 										</FormControl>
+										<FormMessage />
 									</FormItem>
 								)}
 							/>
 
 							<FormField
-								control={expenseForm.control}
+								control={incomeForm.control}
 								name="description"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Masraf Açıklaması</FormLabel>
+										<FormLabel>Gelir Açıklaması</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="Masraf için açıklama giriniz"
+												placeholder="Gelir için açıklama giriniz"
 												{...field}
 											/>
 										</FormControl>
+										<FormMessage />
 									</FormItem>
 								)}
 							/>
 
 							<FormField
-								control={expenseForm.control}
+								control={incomeForm.control}
 								name="amount"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Masraf Miktarı</FormLabel>
+										<FormLabel>Gelir Miktarı</FormLabel>
 										<FormControl>
 											<Input
-												type="text"
-												placeholder="Masraf miktarı giriniz (₺)"
-												value={field.value}
+												type="number"
+												placeholder="Gelir miktarı giriniz (₺)"
+												{...field}
 												onChange={(e) =>
 													field.onChange(
-														e.target.value
+														e.target.valueAsNumber
 													)
 												}
 											/>
 										</FormControl>
+										<FormMessage />
 									</FormItem>
 								)}
 							/>
 
 							<FormField
-								control={expenseForm.control}
+								control={incomeForm.control}
 								name="date"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Masraf Tarihi</FormLabel>
+										<FormLabel>Gelir Tarihi</FormLabel>
 										<FormControl>
 											<Input
 												value={field.value}
@@ -204,28 +212,29 @@ export function ExpenseForm() {
 														field.onChange
 													)
 												}
-												placeholder="Masraf tarihi giriniz (GG/AA/YYYY)"
+												placeholder="Gelir tarihi giriniz (GG/AA/YYYY)"
 											/>
 										</FormControl>
+										<FormMessage />
 									</FormItem>
 								)}
 							/>
 
 							<FormField
-								control={expenseForm.control}
+								control={incomeForm.control}
 								name="category"
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Gelir Kategorisi</FormLabel>
 										<Select
-											onValueChange={(value) =>
-												field.onChange(value)
-											}
+											onValueChange={field.onChange}
 											value={field.value}
 										>
-											<SelectTrigger>
-												<SelectValue placeholder="Gelir kategorisi seçiniz" />
-											</SelectTrigger>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Gelir kategorisi seçiniz" />
+												</SelectTrigger>
+											</FormControl>
 											<SelectContent>
 												{categories.map(
 													(category, index) => (
@@ -241,12 +250,13 @@ export function ExpenseForm() {
 												)}
 											</SelectContent>
 										</Select>
+										<FormMessage />
 									</FormItem>
 								)}
 							/>
 
 							<DialogFooter className="py-3">
-								<Button type="submit">Masrafı Kaydet</Button>
+								<Button type="submit">Geliri Kaydet</Button>
 							</DialogFooter>
 						</form>
 					</Form>
